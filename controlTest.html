@@ -1,0 +1,299 @@
+<!--Задача. Створити клас «Тренажер арифметичних операцій»-->
+
+<!--Випадковим чином генеруємо :-->
+<!--•	перше число;-->
+<!--•	друге число;-->
+<!--•	операцію, яку треба виконати.-->
+<!--Користувач вводить свій варіант відповіді і натискає на «Check». Після перевірки користувачу
+виводиться результат.-->
+<!--На основі цього класу створити клас «Тестер», який виконує перевірку вказаної кількості завдань
+(при цьому зберігає неправильні відповіді), нараховує бали у 100 бальній шкалі.-->
+
+<!--Після тестування вивести усі неправильні відповіді із вказування правильних-->
+
+<!--Неправильні відповіді	Правильно так-->
+<!--2*9=20              	2*9=18-->
+<!--12-7=6	                12-7=5-->
+<!--На зовнішньому вигляді увагу не акцентуємо-->
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Гулаков О.С."/>
+    <meta name = "keywords" content ="Content"/>
+    <meta name="description" content ="Description"/>
+    <title>Title</title>
+
+</head>
+<body>
+<div id="container">
+
+</div>
+
+<script>
+    "use strict";
+    class AriphmeticTrainer{
+        constructor(minNumber=-100,maxNumber=100) {
+            this.FirstNumber,this.SecondNumber,this.Answer;
+            this.Operation=this.getOperation();
+            Object.defineProperties(this, {
+                MinNumber: {
+                    get: function () {
+                        return minNumber;
+                    },
+                    set: function (value) {
+                        if (value <= maxNumber)
+                            minNumber = value;
+                        else {
+                            minNumber = maxNumber;
+                            maxNumber = value;}}},
+                MaxNumber: {
+                    get: function () {
+                        return maxNumber;
+                    },
+                    set: function (value) {
+                        if (value >= minNumber)
+                            maxNumber = value;
+                        else {
+                            maxNumber = minNumber;
+                            minNumber = value;}}}})
+        }
+        getOperation(){
+            let operation=this.getRandom(1,4);
+            switch(operation) {
+                case 1: return "+";
+                case 2: return "-";
+                case 3: return "*";
+                case 4: return "/";
+            }
+        }
+        getRandom(min=this.MinNumber,max=this.MaxNumber){
+            return Math.floor(Math.random()*(max-min+1))+min;
+        }
+        render(parentId){
+            let firstNumberLabel=document.createElement("label");
+            firstNumberLabel.setAttribute("for","firstNumber");
+            firstNumberLabel.textContent="First Number";
+            let firstNumberInput=document.createElement("input");
+            firstNumberInput.id="firstNumber";
+            firstNumberInput.value=this.FirstNumber=this.getRandom();
+            let paragragh=document.createElement("p");
+            paragragh.textContent="Operation: ";
+            let newSpan=document.createElement("span");
+            newSpan.setAttribute("id","operation");
+            newSpan.textContent=this.Operation;
+            paragragh.appendChild(newSpan);
+            let secondNumberLabel=document.createElement("label");
+            secondNumberLabel.setAttribute("for","secondNumber");
+            secondNumberLabel.textContent="Second Number";
+            let secondNumberInput=document.createElement("input");
+            secondNumberInput.id="secondNumber";
+            secondNumberInput.value=this.SecondNumber=this.getRandom();
+            let newHr=document.createElement("hr");
+            let answerLabel=document.createElement("label");
+            answerLabel.setAttribute("for","answer");
+            answerLabel.textContent="Your answer: ";
+            let answerInput=document.createElement("input");
+            answerInput.id="answer";
+            let button=document.createElement("input");
+            button.type="button";
+            button.id="buttonCheck";
+            button.value="Check";
+            button.addEventListener("click",this.checkResult.bind(this));
+            let resultParag=document.createElement("p");
+            resultParag.textContent="Result: ";
+            let resultSpan=document.createElement("span");
+            resultSpan.setAttribute("id","result");
+            resultParag.appendChild(resultSpan);
+            document.getElementById(parentId).appendChild(firstNumberLabel);
+            document.getElementById(parentId).appendChild(firstNumberInput);
+            document.getElementById(parentId).appendChild(paragragh);
+            document.getElementById(parentId).appendChild(secondNumberLabel);
+            document.getElementById(parentId).appendChild(secondNumberInput);
+            document.getElementById(parentId).appendChild(newHr);
+            document.getElementById(parentId).appendChild(answerLabel);
+            document.getElementById(parentId).appendChild(answerInput);
+            document.getElementById(parentId).appendChild(button);
+            document.getElementById(parentId).appendChild(resultParag);
+        }
+        checkResult(){
+            let trueResult;
+            this.Answer=document.getElementById("answer").value;
+            switch (this.Operation){
+                case '+': trueResult = +this.FirstNumber + +this.SecondNumber;
+//                        alert(`first number:${this.FirstNumber}, second:${this.SecondNumber},operation:${this.Operation},result:${trueResult},answer:${this.Answer}`);
+                    break;
+                case '-': trueResult = this.FirstNumber - this.SecondNumber;
+//                        alert(`first number:${this.FirstNumber}, second:${this.SecondNumber},operation:${this.Operation},result:${trueResult},answer:${this.Answer}`);
+                    break;
+                case '*': trueResult = this.FirstNumber * this.SecondNumber;
+//                        alert(`first number:${this.FirstNumber}, second:${this.SecondNumber},operation:${this.Operation},result:${trueResult},answer:${this.Answer}`);
+                    break;
+                case '/': trueResult = (this.FirstNumber / this.SecondNumber);
+//                        alert(`first number:${this.FirstNumber}, second:${this.SecondNumber},operation:${this.Operation},result:${trueResult},answer:${this.Answer}`);
+                    break;
+            }
+            let resultElement=document.getElementById("result");
+            if (trueResult==this.Answer)
+                resultElement.textContent="OK";
+            else {
+                resultElement.textContent="Wrong";
+            }
+        }
+    }
+    //==================== TESTER =====================================
+    class Tester extends AriphmeticTrainer{
+        constructor(minNumber=-100,maxNumber=100,countOfTasks){
+            super(minNumber,maxNumber);
+            Object.defineProperty(this, "CountOfTasks", {
+                get: function () {
+                    return countOfTasks;},
+                set: function (value) {
+                    if (value >= 0)
+                        countOfTasks = value;
+                    else throw new Error("value must be more than 0");}}
+            );
+            this.CurrentTask=1;
+            this.Score=0;
+            this.PointsPerAnswer=100/this.CountOfTasks;
+            this.WrongAnswers=0;
+            this.WrongResultText=[];
+            this.TrueResultText=[];
+        }
+        render(parentId){
+            let tasksCountLabel=document.createElement("label");
+            tasksCountLabel.setAttribute("for","taksCount");
+            tasksCountLabel.textContent="Total Questions Count";
+            let tasksCountInput=document.createElement("input");
+            tasksCountInput.id="tasksCount";
+            tasksCountInput.value=this.CountOfTasks;
+
+            let currentTaskLabel=document.createElement("label");
+            currentTaskLabel.setAttribute("for","currentTask");
+            currentTaskLabel.textContent="Current Question: ";
+            let currentTaskInput=document.createElement("input");
+            currentTaskInput.id="currentTask";
+            currentTaskInput.value=this.CurrentTask;
+
+            let newBr=document.createElement("br");
+            let secondBr=document.createElement("br");
+            let thirdBr=document.createElement("br");
+
+            let scoreLabel=document.createElement("label");
+            scoreLabel.setAttribute("for","score");
+            scoreLabel.textContent="Score: ";
+            let scoreInput=document.createElement("input");
+            scoreInput.id="score";
+            scoreInput.value=this.Score;
+            let newHr=document.createElement("hr");
+
+            document.getElementById(parentId).appendChild(tasksCountLabel);
+            document.getElementById(parentId).appendChild(tasksCountInput);
+            document.getElementById(parentId).appendChild(newBr);
+            document.getElementById(parentId).appendChild(currentTaskLabel);
+            document.getElementById(parentId).appendChild(currentTaskInput);
+            document.getElementById(parentId).appendChild(secondBr);
+            document.getElementById(parentId).appendChild(scoreLabel);
+            document.getElementById(parentId).appendChild(scoreInput);
+            document.getElementById(parentId).appendChild(thirdBr);
+            document.getElementById(parentId).appendChild(newHr);
+
+        }
+        go(parentId){
+
+            this.render(parentId);
+            super.render(parentId);
+            let button=document.getElementById("buttonCheck");
+            button.addEventListener("click",this.nextTask.bind(this));
+        }
+        nextTask(){
+            this.CurrentTask++;
+            document.getElementById("currentTask").value=this.CurrentTask;
+            if(this.CurrentTask<=this.CountOfTasks){
+                let first=document.getElementById("firstNumber");
+                first.value=this.FirstNumber=this.getRandom();
+                let second=document.getElementById("secondNumber");
+                second.value=this.SecondNumber=this.getRandom();
+                let operation=document.getElementById("operation");
+                this.Operation=this.getOperation();
+                operation.textContent=this.Operation;
+
+            }
+            else this.showWrongAnswers("container");
+        }
+        checkResult() {
+            let trueResult;
+            this.Answer=document.getElementById("answer").value;
+            switch (this.Operation){
+                case '+': trueResult = +this.FirstNumber + +this.SecondNumber;
+                    break;
+                case '-': trueResult = this.FirstNumber - this.SecondNumber;
+                    break;
+                case '*': trueResult = this.FirstNumber * this.SecondNumber;
+                    break;
+                case '/': trueResult = (this.FirstNumber / this.SecondNumber);
+                    break;
+            }
+            let resultElement=document.getElementById("result");
+            if (trueResult==this.Answer){
+                resultElement.textContent="OK";
+                this.Score+=this.PointsPerAnswer;
+                document.getElementById("score").value=this.Score.toFixed(2);
+            }
+            else {
+                resultElement.textContent="Wrong";
+                let index=this.WrongAnswers;
+                this.WrongResultText[index]=`${this.FirstNumber}${this.Operation}${this.SecondNumber}=${this.Answer}`;
+                this.TrueResultText[index]=`${this.FirstNumber}${this.Operation}${this.SecondNumber}=${trueResult}`;
+                this.WrongAnswers++;
+            }
+
+        }
+        showWrongAnswers(parentId){
+            let table = document.createElement("table");
+            table.style.border="2px solid";
+            table.style.marginLeft="200px";
+            for(let i=0;i<=this.WrongAnswers;i++){
+                let tr = document.createElement("tr");
+                if(i<1) {
+                    for (let j=0;j<2;j++){
+                        let th = document.createElement("th");
+                        if(j==0)th.textContent="Wrong answers";
+                        else  th.textContent="Must be";
+                        th.style.border="1px solid";
+                        th.style.width="100px";
+                        th.style.height="70px";
+                        tr.appendChild(th);
+                    }
+                }
+                else {
+                    for (let k=0;k<2;k++){
+                        let td = document.createElement("td");
+                        if(k==0){
+                            td.textContent=this.WrongResultText[i-1];
+                            td.style.color="red";
+                        }
+                        else  {
+                            td.textContent=this.TrueResultText[i-1];
+                            td.style.color="green";
+                        }
+                        td.style.border="1px solid";
+                        td.style.height="50px";
+                        tr.appendChild(td);
+                    }
+                }
+                table.appendChild(tr);
+            }
+            document.getElementById(parentId).appendChild(table);
+        }
+    }
+
+    let tester = new Tester(-2,5,5);
+    tester.go("container");
+
+</script>
+</body>
+
+</html>

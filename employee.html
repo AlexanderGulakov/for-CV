@@ -1,0 +1,95 @@
+<!--Приклад 2. Створити клас Employee-->
+<!--Властивості	-->
+<!--ID-->
+<!--ПІБ-->
+<!--Заробітна плата-->
+<!--Методи	Визначення ЗП за рік-->
+<!--ToString-->
+
+<!--На основі цього класу створити клас МЕНЕДЖЕР-->
+<!--Властивості	ID-->
+<!--ПІБ-->
+<!--Заробітна плата-->
+<!--Номер відділу, у якому керує-->
+<!--Методи	Визначення ЗП за рік-->
+<!--ToString-->
+
+<script>
+    "use strict";
+
+    //==============              EMPLOYEE               ========================================
+    class Employee {
+        constructor(id="555",surname ="Ivanov",name="Ivan",secondName="Ivanovych",salary="3300"){
+            Object.defineProperties(this,{
+                ID:{
+                    value:id
+                },
+                Surname:{
+                    get: function () {
+                        return surname;
+                    },
+                    set: function (value) {
+                        surname=value;
+                    }
+                },
+                Name:{
+                    value:name
+                },
+                SecondName:{
+                    value:secondName
+                },
+                Fullname:{
+                    get:function () {
+                        return this.Surname+" "+this.Name+" "+this.SecondName;
+                    }
+                },
+                Salary:{
+                    get: function () {
+                        return salary;
+                    },
+                    set: function (value) {
+                        if(isNumeric(value)&&value>=3200) salary=value;
+                        else throw new Error('value is incorrect');
+                    }
+                }
+            })
+        }
+        getYearAmountSalary(){
+            return this.Salary*12;
+        }
+        toString(){
+            return `${this.Fullname}, ID= ${this.ID}, salary:${this.Salary}, year salary:${this.getYearAmountSalary()}`;
+        }
+    }
+
+    //========================================================================================================
+    //========================           MANAGER               =======================================
+    class Manager extends Employee {
+        constructor(id = "777",surname ="Managerov",name="Manager",secondName="Managerovych",salary="7000", departmentNumber = "00"){
+            super(id, surname,name,secondName,salary);
+            this.department=departmentNumber;
+        }
+        toString(){
+            return super.toString()+' department:'+this.department;
+        }
+    }
+    //=======================================================================
+    //=============================================================
+    function isNumeric(n) {
+        return !isNaN(parseFloat(n)) && isFinite(n);
+    }
+    //=======================================================================
+
+    let Vano=new Employee();
+    let Dano=new Employee(333,"Danov", "Dan", "Danovych",4000);
+    let Kano=new Manager();
+    let Tako=new Manager(111,"Gorzov", "Gorzo", "Gorzovych", 50000,3);
+    document.write(Vano.toString());
+    document.write('<br>');
+    document.write(Dano.toString());
+    document.write('<br>');
+    document.write(Kano.toString());
+    document.write('<br>');
+    document.write(Tako.toString());
+
+</script>
